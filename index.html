@@ -23,24 +23,32 @@
             const topic = document.getElementById('topicInput').value;
             const outputDiv = document.getElementById('output');
             if(!topic) return alert("Please enter a topic first!");
-
+            
             outputDiv.innerText = "Thinking...";
+            
+            try {
+                // FIXED: Using Relative Routing to prevent net::ERR_CONNECTION_TIMED_OUT errors
+                const response = await fetch('/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ 'topic': topic })
+                });
 
-            // Note: We will update 'http://localhost:8000' later with your live cloud URL
-            const response = await fetch('http://localhost:8000/stream', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ 'topic': topic })
-            });
+                if (!response.ok) {
+                    throw new Error("Server responded with status " + response.status);
+                }
 
-            outputDiv.innerText = ""; 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
+                outputDiv.innerText = ""; 
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
 
-            while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                outputDiv.innerText += decoder.decode(value);
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    outputDiv.innerText += decoder.decode(value);
+                }
+            } catch (error) {
+                outputDiv.innerText = "Error fetching data: " + error.message;
             }
         }
     </script>
