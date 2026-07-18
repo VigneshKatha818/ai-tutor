@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor Explainer</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; width: 100%; }
+        #output { background: #f4f4f4; padding: 15px; margin-top: 20px; border-left: 5px solid #007bff; min-height: 50px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h2>🚀 1-Topic AI Tutor</h2>
+    <p>Enter any hard concept or topic to get a simple breakdown:</p>
+    <input type="text" id="topicInput" placeholder="e.g., Quantum Computing, Inflation, Photosynthesis">
+    <button onclick="startLearning()">Explain it Simply!</button>
+    <div id="output">Waiting for your topic...</div>
+
+    <script>
+        async function startLearning() {
+            const topic = document.getElementById('topicInput').value;
+            const outputDiv = document.getElementById('output');
+            if(!topic) return alert("Please enter a topic first!");
+
+            outputDiv.innerText = "Thinking...";
+
+            // Note: We will update 'http://localhost:8000' later with your live cloud URL
+            const response = await fetch('http://localhost:8000/stream', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'topic': topic })
+            });
+
+            outputDiv.innerText = ""; 
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                outputDiv.innerText += decoder.decode(value);
+            }
+        }
+    </script>
+</body>
+</html>
