@@ -22,7 +22,7 @@ client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY", "gsk_BISy3Vlx2Xk46ltbajnMWG
 async def stream_tutor(topic: str = Form(...)):
     async def generate_explanation():
         response = await client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are a friendly AI Tutor. Explain the user's topic like they are 5 years old using clear, simple analogies."},
                 {"role": "user", "content": f"Explain this topic: {topic}"}
