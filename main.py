@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI, Form
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import AsyncGroq
 from dotenv import load_dotenv
@@ -15,8 +15,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Paste your actual gsk_ key inside the quotes as a safe local backup
+# Your real API key configuration
 client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY", "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"))
+
+@app.get("/", response_class=HTMLResponse)
+async def get_interface():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 @app.post("/stream")
 async def stream_tutor(topic: str = Form(...)):
@@ -30,8 +35,10 @@ async def stream_tutor(topic: str = Form(...)):
             stream=True
         )
         async for chunk in response:
-            content = chunk.choices[0].delta.content
-            if content:
-                yield content
+            # FIXED: Safely extracting data based on the latest groq library rules
+            if hasattr(chunk, 'choices') and chunk.choices:
+                delta = chunk.choices[0].delta
+                if hasattr(delta, 'content') and delta.content:
+                    yield delta.content
 
     return StreamingResponse(generate_explanation(), media_type="text/plain")
