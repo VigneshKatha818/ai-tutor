@@ -4,7 +4,8 @@ from fastapi.responses import StreamingResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from groq import AsyncGroq
 from dotenv import load_dotenv
-
+from google import genai
+import os
 load_dotenv()
 app = FastAPI()
 
