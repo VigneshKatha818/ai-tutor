@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 # Your real API key configuration
-client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY", "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"))
+client = AsyncGroq(api_key=os.getenv("GROQ_API_KEY", "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"))
 
 @app.get("/", response_class=HTMLResponse)
 async def get_interface():
